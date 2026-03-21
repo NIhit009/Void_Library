@@ -87,18 +87,22 @@ exports.getCode = [
 
     }]
 
-
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: "Invalid Details.." });
-        const checkPassword = bcrypt.compare(password, user.password);
+        const checkPassword = await bcrypt.compare(password, user.password);
         if (!checkPassword) return res.status(404).json({ message: "Invalid Details.." });
         signToken(res, user.fullName, user.email);
-        return res.status(200).json({ message: "Login Successfull" });
+        return res.status(200).json({ message: "Login Successfull.." });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Server error occured while logging in.." });
     }
+}
+
+exports.logout = (req, res) => {
+    res.clearCookie("authCookie");
+    return res.status(200).json({message: "Logged out.."});
 }
